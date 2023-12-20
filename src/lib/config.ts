@@ -7,7 +7,7 @@ interface Config {
 const prcss = process.argv;
 let CONFIG : Config = getConfig()
 
-function throwError( error : string ) {
+export function throwError( error : string ) {
     
     console.log(error)
     process.exit()
