@@ -3,12 +3,11 @@ import Url, { urlStruct } from "./url";
 import axios from "axios";
 
 interface reqOptions {
-    baseURL : string;
+    url : string;
     host : string;
     method : string
     path : string | undefined
 }
-
 
 export default class Tree extends EventEmitter {
 
@@ -38,15 +37,19 @@ export default class Tree extends EventEmitter {
 
         for(let i = 0; i < this.queue.length; i++){
 
-            let url : urlStruct = new Url(this.queue[i]).digest();
+            let url : string = this.queue[i];
+            let structure : urlStruct = new Url(this.queue[i]).digest();
+            
             let reqOption : reqOptions = {
-                baseURL : <string> url.baseURL,
-                host : <string> url.host,
+                url :  url,
+                host : <string> structure.host,
                 method : "GET",
-                path : <string> url.path ?? "/"
+                path : <string> structure.path ?? "/"
             }
 
             let content = await this.getContent(reqOption)
+
+            this.emit("done", url)
             let extracted = this.extract(content);
         }
 
@@ -56,7 +59,7 @@ export default class Tree extends EventEmitter {
 
     public async getContent(reqOtion : reqOptions) : Promise<string> {
         
-        const body = await axios.get(reqOtion.baseURL).then( (res) => {
+        const body = await axios.get(reqOtion.url).then( (res) => {
             return res.data;
         })
 

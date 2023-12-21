@@ -1,18 +1,17 @@
+type undefinedStr = string | undefined;
+
 export interface urlStruct {
-    baseURL : string | undefined;
-    host : string | undefined;
-    path : string | undefined;
-    protocol : number | undefined
+    host : undefinedStr;
+    path : undefinedStr;
 }
 
 export default class Url {
 
-    public url : string;
+    url : string;
+
     public digested : urlStruct = {
-        baseURL : undefined,
         host : undefined,
         path : undefined,
-        protocol : undefined
     }
 
     constructor(url : string){
@@ -20,6 +19,10 @@ export default class Url {
     }
 
     public digest() : urlStruct {
+
+        this.digested.host = this.getHost();
+        this.digested.path = this.getPath();
+
         return this.digested;
     }
 
@@ -27,15 +30,28 @@ export default class Url {
         return false;
     }
 
-    public getHost() {
-
+    public isValidHost() : boolean {
+        return false;
     }
 
-    public getPath() {
+    public getHost(url : string = this.url) : undefinedStr {
 
+        let start : number = 0;
+        let host : string = "";
+
+        if(url.indexOf("https")) start = "https://".length;
+        else if(url.indexOf("http")) start = "http://".length;
+
+        let fullURL = url.substring(start, url.length);
+
+        if(fullURL[0] !== "/") host = fullURL.split("/")[0];
+        
+        if(host.indexOf(":")) host = host.slice(0, host.indexOf(":"));
+
+        return ""
     }
 
-    public getProtocol() {
-
+    public getPath(url : string = this.url) : undefinedStr {
+        return ""
     }
 }
