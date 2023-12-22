@@ -32,7 +32,7 @@ export default class Url {
 
     public isValidHost(host : string) : boolean {
         
-        let separatedHost : string = host.replace(".", "");
+        let separatedHost : string = host.replace(/./g, "");
         
         if(isNaN(parseFloat(separatedHost))){
             

@@ -47,10 +47,10 @@ export default class Tree extends EventEmitter {
                 path : <string> structure.path ?? "/"
             }
 
-            let content = await this.getContent(reqOption)
+            let content : string = await this.getContent(reqOption)
 
             this.emit("done", url)
-            let extracted = this.extract(content);
+            let urls : string[] = this.extract(content);
         }
 
         return tree;
@@ -69,9 +69,39 @@ export default class Tree extends EventEmitter {
 
     public extract(content : string) : string[]{
 
-        let extracted : string[] = [];
+        content = content.replace(/\s/g, "");
+        let urls : string[] = [];
+        let pattern : string[] = ["src", "href"]
+        let use : number;
+        let start : number;
+        let url : string;
 
-        return extracted;
+        for(let i = 0; i < content.length; i++){
+
+            if(content.indexOf("src") === -1 && content.indexOf("href") === -1) break;
+
+            if(content.indexOf("src") < content.indexOf("href")){
+                start = content.indexOf("src");
+                use = 0;
+            }else{
+                start = content.indexOf("href");
+                use = 1;
+            }
+
+            content = content.slice(content.indexOf(pattern[use]) + pattern[use].length + 2, content.length);
+            
+            url = content.substring(0, content.indexOf('"'));
+
+            content = content.slice(url.length, content.length);
+
+            urls.push(url);
+        }
+
+        return urls;
+
+    }
+
+    public check(urls : string[]){
 
     }
 
