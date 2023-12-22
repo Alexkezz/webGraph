@@ -27,10 +27,20 @@ export default class Url {
     }
 
     public isValid() : boolean {
-        return false;
+        return (this.digested.host) ? true : false;
     }
 
-    public isValidHost() : boolean {
+    public isValidHost(host : string) : boolean {
+        
+        let separatedHost : string = host.replace(".", "");
+        
+        if(isNaN(parseFloat(separatedHost))){
+            
+            let pattern : RegExp = /^[a-zA-Z0-9]+$/
+
+            if(pattern.test(separatedHost)) return true;
+        }
+        
         return false;
     }
 
@@ -48,10 +58,21 @@ export default class Url {
         
         if(host.indexOf(":")) host = host.slice(0, host.indexOf(":"));
 
-        return ""
+        return (this.isValidHost(host)) ? host : undefined;
     }
 
     public getPath(url : string = this.url) : undefinedStr {
-        return ""
+        
+        let path : undefinedStr;
+
+        if(url[0] === "/") path = url;
+        else{
+
+            let host : undefinedStr = this.getHost(url);
+            if(host) path = host.split(host)[1];
+        
+        }
+
+        return (path && path !== "") ? path : undefined;
     }
 }
