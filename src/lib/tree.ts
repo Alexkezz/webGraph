@@ -50,9 +50,13 @@ export default class Tree extends EventEmitter {
             }
 
             let content : string = await this.getContent(reqOption)
-            this.emit("done", url)
+            // this.emit("done", url)
             let urls : string[] = this.extract(content);
-            this.queue = this.check(urls);
+
+            // urls.forEach(url => {
+            //     console.log(url);
+            // });
+            //this.queue = this.check(urls);
         }
 
         return tree;
@@ -72,33 +76,35 @@ export default class Tree extends EventEmitter {
     public extract(content : string) : string[]{
 
         content = content.replace(/\s/g, "");
+
         let urls : string[] = [];
-        let pattern : string[] = ["src", "href"]
+        let pattern : string[] = ["src=", "href="]
         let use : number;
         let start : number;
         let url : string;
 
-        for(let i = 0; i < content.length; i++){
+        while(true){
 
-            if(content.indexOf("src") === -1 && content.indexOf("href") === -1) break;
+            if(content.indexOf("src=") === -1 && content.indexOf("href=") === -1) break;
 
-            if(content.indexOf("src") < content.indexOf("href")){
-                start = content.indexOf("src");
-                use = 0;
-            }else{
-                start = content.indexOf("href");
-                use = 1;
-            }
+            let srcIndex = content.indexOf("src=");
+            let hrefIndex = content.indexOf("href=");
 
-            content = content.slice(content.indexOf(pattern[use]) + pattern[use].length + 2, content.length);
+            start = srcIndex < hrefIndex ? srcIndex : hrefIndex;
+            use = srcIndex < hrefIndex ? 0 : 1;
+
+            content = content.slice(content.indexOf(pattern[use]) + pattern[use].length + 1, content.length);
+
+            let quoteIndex = (content.indexOf('"') < content.indexOf("'")) ? content.indexOf('"') : content.indexOf("'")
+            url = content.substring(0, quoteIndex);
             
-            url = content.substring(0, content.indexOf('"'));
-
             content = content.slice(url.length, content.length);
 
             urls.push(url);
-        }
 
+            console.log(url);
+        }
+        
         return urls;
 
     }

@@ -1,4 +1,3 @@
-import { Console } from "console";
 import { CONFIG, strUndf, throwError } from "./lib/config.js";
 import Tree from "./lib/tree.js";
 

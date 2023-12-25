@@ -32,7 +32,7 @@ export default class Url {
 
     public isValidHost(host : string) : boolean {
         
-        let separatedHost : string = host.replace(/./g, "");
+        let separatedHost : string = host.split('.').join('');
         
         if(isNaN(parseFloat(separatedHost))){
             
@@ -49,14 +49,14 @@ export default class Url {
         let start : number = 0;
         let host : string = "";
 
-        if(url.indexOf("https")) start = "https://".length;
-        else if(url.indexOf("http")) start = "http://".length;
+        if(url.indexOf("https") !== -1) start = "https://".length;
+        else if(url.indexOf("http") !== -1) start = "http://".length;
 
         let fullURL = url.substring(start, url.length);
 
         if(fullURL[0] !== "/") host = fullURL.split("/")[0];
         
-        if(host.indexOf(":")) host = host.slice(0, host.indexOf(":"));
+        if(host.indexOf(":") !== -1) host = host.slice(0, host.indexOf(":"));
 
         return (this.isValidHost(host)) ? host : undefined;
     }
@@ -69,10 +69,11 @@ export default class Url {
         else{
 
             let host : undefinedStr = this.getHost(url);
-            if(host) path = host.split(host)[1];
-        
+            if(host) path = url.split(host)[1];
+
         }
 
         return path;
+
     }
 }
