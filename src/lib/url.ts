@@ -73,6 +73,6 @@ export default class Url {
         
         }
 
-        return (path && path !== "") ? path : undefined;
+        return path;
     }
 }

@@ -7,14 +7,15 @@ interface reqOptions {
     host : string;
     method : string
     path : string | undefined
+    headers : string | undefined;
 }
 
 export default class Tree extends EventEmitter {
 
     url : Url;
     queue : string[] = [];
-    done : string [] = [];
-    urls : string[] = [];
+    paths : string[] = [];
+    hosts: string[] = [];
 
     constructor(url : string){
         super();
@@ -38,19 +39,20 @@ export default class Tree extends EventEmitter {
         for(let i = 0; i < this.queue.length; i++){
 
             let url : string = this.queue[i];
-            let structure : urlStruct = new Url(this.queue[i]).digest();
+            let structure : urlStruct = new Url(url).digest();
             
             let reqOption : reqOptions = {
                 url :  url,
                 host : <string> structure.host,
                 method : "GET",
-                path : <string> structure.path ?? "/"
+                path : <string> structure.path ?? "/",
+                headers : ""
             }
 
             let content : string = await this.getContent(reqOption)
-
             this.emit("done", url)
             let urls : string[] = this.extract(content);
+            this.queue = this.check(urls);
         }
 
         return tree;
@@ -101,7 +103,9 @@ export default class Tree extends EventEmitter {
 
     }
 
-    public check(urls : string[]){
+    public check(urls : string[]) : string[] {
+
+        return [] 
 
     }
 

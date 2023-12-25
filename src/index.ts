@@ -1,6 +1,6 @@
 import { Console } from "console";
-import { CONFIG, strUndf, throwError } from "./config.js";
-import Tree from "./tree.js";
+import { CONFIG, strUndf, throwError } from "./lib/config.js";
+import Tree from "./lib/tree.js";
 
 let URL : string = <string> CONFIG.url;
 let tree : Tree = new Tree(URL)
