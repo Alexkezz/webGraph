@@ -52,11 +52,7 @@ export default class Tree extends EventEmitter {
             let content : string = await this.getContent(reqOption)
             // this.emit("done", url)
             let urls : string[] = this.extract(content);
-
-            // urls.forEach(url => {
-            //     console.log(url);
-            // });
-            //this.queue = this.check(urls);
+            this.check(urls);
         }
 
         return tree;
@@ -76,33 +72,32 @@ export default class Tree extends EventEmitter {
     public extract(content : string) : string[]{
 
         content = content.replace(/\s/g, "");
-
+        
         let urls : string[] = [];
         let pattern : string[] = ["src=", "href="]
-        let use : number;
-        let start : number;
-        let url : string;
 
-        while(true){
+        while(content.indexOf("src=") !== -1 && content.indexOf("href=") !== -1){
 
-            if(content.indexOf("src=") === -1 && content.indexOf("href=") === -1) break;
-
-            let srcIndex = content.indexOf("src=");
-            let hrefIndex = content.indexOf("href=");
-
-            start = srcIndex < hrefIndex ? srcIndex : hrefIndex;
-            use = srcIndex < hrefIndex ? 0 : 1;
-
-            content = content.slice(content.indexOf(pattern[use]) + pattern[use].length + 1, content.length);
-
-            let quoteIndex = (content.indexOf('"') < content.indexOf("'")) ? content.indexOf('"') : content.indexOf("'")
-            url = content.substring(0, quoteIndex);
+            let srcIndex = content.indexOf(pattern[0]) + pattern[0].length;
+            let hrefIndex = content.indexOf(pattern[1]) + pattern[1].length;
+            let start : number = srcIndex < hrefIndex ? srcIndex : hrefIndex;
+            let url : string = "";
             
-            content = content.slice(url.length, content.length);
+            if(content[start] === "'" || content[start] === '"'){
+                
+                content = content.slice(start + 1, content.length);
 
-            urls.push(url);
+                let quoteIndex = (content.indexOf('"') < content.indexOf("'")) ? content.indexOf('"') : content.indexOf("'")
+                url = content.substring(0, quoteIndex);
+                
+                content = content.slice(url.length + 1, content.length);
+    
+                urls.push(url);
+                
+            }else{
+                content = content.slice(start, content.length);
+            }
 
-            console.log(url);
         }
         
         return urls;
@@ -110,6 +105,8 @@ export default class Tree extends EventEmitter {
     }
 
     public check(urls : string[]) : string[] {
+
+        
 
         return [] 
 
