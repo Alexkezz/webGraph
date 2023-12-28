@@ -19,9 +19,10 @@ export default class Tree extends EventEmitter {
 
     constructor(url : string){
         super();
+        
         this.url = new Url(url);
         this.url.digest();
-        
+
         if(!this.url.isValid()) this.throwError("Invalid url")
     }
 
@@ -104,11 +105,27 @@ export default class Tree extends EventEmitter {
 
     }
 
-    public check(urls : string[]) : string[] {
+    public check(urls : string[]) : void {
 
-        
+        for(let url of urls){
 
-        return [] 
+            let sameHost = this.url.compareHost(url);
+
+            if(sameHost && this.queue.indexOf(url) !== -1) {
+                this.queue.push(url);  
+            } 
+            else if(!sameHost){
+ 
+                let host : string | undefined = new Url(url).digest().host;
+
+                if(host){
+                    if(host.indexOf(this.url.digested.host!) !== -1 && this.queue.indexOf(url) !== -1) this.queue.push(url);
+                    else if(this.hosts.indexOf(host)) this.hosts.push(url);
+                }
+                
+            }
+            
+        }     
 
     }
 

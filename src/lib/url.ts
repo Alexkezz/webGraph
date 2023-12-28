@@ -76,4 +76,11 @@ export default class Url {
         return path;
 
     }
+
+    public compareHost(url : string) {
+
+        let host = this.getHost(url);
+        return (this.digested.host === host) ? true : false;
+
+    }
 }
