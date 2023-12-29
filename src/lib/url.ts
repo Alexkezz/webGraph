@@ -36,7 +36,7 @@ export default class Url {
         
         if(isNaN(parseFloat(separatedHost))){
             
-            let pattern : RegExp = /^[a-zA-Z0-9]+$/
+            let pattern : RegExp = /^[a-zA-Z0-9-]+$/
 
             if(pattern.test(separatedHost)) return true;
         }
@@ -65,7 +65,10 @@ export default class Url {
         
         let path : undefinedStr;
 
-        if(url[0] === "/") path = url;
+        if(url[0] === "/"){
+            path = url;
+            this.digested.host = "/";
+        } 
         else{
 
             let host : undefinedStr = this.getHost(url);
@@ -77,10 +80,7 @@ export default class Url {
 
     }
 
-    public compareHost(url : string) {
-
-        let host = this.getHost(url);
-        return (this.digested.host === host) ? true : false;
-
+    public compareHost(host : undefinedStr) {
+        return (this.digested.host === host || host === "/");
     }
 }

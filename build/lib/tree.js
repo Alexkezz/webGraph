@@ -33,10 +33,10 @@ class Tree extends events_1.EventEmitter {
     tree() {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let tree = [];
             this.queue.push(this.url.url);
             for (let i = 0; i < this.queue.length; i++) {
                 let url = this.queue[i];
+                // console.log(this.queue);
                 let structure = new url_1.default(url).digest();
                 let reqOption = {
                     url: url,
@@ -45,12 +45,16 @@ class Tree extends events_1.EventEmitter {
                     path: (_a = structure.path) !== null && _a !== void 0 ? _a : "/",
                     headers: ""
                 };
+                //console.log("Extreient info url:" + reqOption.url);
                 let content = yield this.getContent(reqOption);
-                // this.emit("done", url)
                 let urls = this.extract(content);
                 this.check(urls);
             }
-            return tree;
+            let hostPathSchema = {
+                paths: this.paths,
+                hosts: this.hosts,
+            };
+            return hostPathSchema;
         });
     }
     getContent(reqOtion) {
@@ -84,7 +88,38 @@ class Tree extends events_1.EventEmitter {
         return urls;
     }
     check(urls) {
-        return [];
+        for (let url of urls) {
+            console.log(url);
+            let urlDigest = new url_1.default(url).digest();
+            let host = urlDigest.host;
+            let path = urlDigest.path;
+            console.log(host);
+            let sameHost = this.url.compareHost(host);
+            if (sameHost && this.queue.indexOf(url) !== -1) {
+                this.queue.push(url);
+                this.savePath(path !== null && path !== void 0 ? path : "/", this.url.digested.host);
+            }
+            else if (!sameHost) {
+                if (host) {
+                    if (host.indexOf(this.url.digested.host) !== -1 && this.queue.indexOf(url) !== -1) {
+                        this.queue.push(url);
+                        this.savePath(path !== null && path !== void 0 ? path : "/", this.url.digested.host);
+                    }
+                    else if (this.hosts.indexOf(host) !== -1) {
+                        this.hosts.push(url);
+                        this.savePath(path !== null && path !== void 0 ? path : "/", host);
+                    }
+                }
+            }
+        }
+    }
+    savePath(path, host) {
+        this.paths.push({
+            path: path,
+            host: host,
+        });
+    }
+    extendQueue(path = "", host = "") {
     }
 }
 exports.default = Tree;

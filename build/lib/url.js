@@ -19,7 +19,7 @@ class Url {
     isValidHost(host) {
         let separatedHost = host.split('.').join('');
         if (isNaN(parseFloat(separatedHost))) {
-            let pattern = /^[a-zA-Z0-9]+$/;
+            let pattern = /^[a-zA-Z0-9-]+$/;
             if (pattern.test(separatedHost))
                 return true;
         }
@@ -41,14 +41,19 @@ class Url {
     }
     getPath(url = this.url) {
         let path;
-        if (url[0] === "/")
+        if (url[0] === "/") {
             path = url;
+            this.digested.host = "/";
+        }
         else {
             let host = this.getHost(url);
             if (host)
                 path = url.split(host)[1];
         }
         return path;
+    }
+    compareHost(host) {
+        return (this.digested.host === host || host === "/");
     }
 }
 exports.default = Url;
