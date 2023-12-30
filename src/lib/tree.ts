@@ -2,6 +2,8 @@ import {EventEmitter} from "events";
 import Url, { urlStruct } from "./url";
 import axios from "axios";
 
+axios.defaults.headers.common['User-Agent'] = 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36';
+
 interface ReqOptions {
     url : string;
     host : string;
@@ -49,7 +51,6 @@ export default class Tree extends EventEmitter {
         for(let i = 0; i < this.queue.length; i++){
 
             let url : string = this.queue[i];
-            // console.log(this.queue);
             let structure : urlStruct = new Url(url).digest();
             
             let reqOption : ReqOptions = {
@@ -60,9 +61,10 @@ export default class Tree extends EventEmitter {
                 headers : ""
             }
 
-            //console.log("Extreient info url:" + reqOption.url);
             let content : string = await this.getContent(reqOption)
             
+            this.emit("done", url);
+
             let urls : string[] = this.extract(content);
             this.check(urls);
         }
@@ -110,7 +112,7 @@ export default class Tree extends EventEmitter {
                 content = content.slice(url.length + 1, content.length);
     
                 urls.push(url);
-                
+
             }else{
                 content = content.slice(start, content.length);
             }
@@ -125,41 +127,43 @@ export default class Tree extends EventEmitter {
 
         for(let url of urls){
 
-            console.log(url);
-
             let urlDigest : urlStruct = new Url(url).digest();
             let host : string | undefined = urlDigest.host;
             let path : string | undefined = urlDigest.path;
             
-            console.log(host);
-
             let sameHost = this.url.compareHost(host);
 
-            if(sameHost && this.queue.indexOf(url) !== -1) {
+            if(sameHost && this.queue.indexOf(url) === -1) {
+                
                 this.queue.push(url);
                 this.savePath(path ?? "/", <string> this.url.digested.host)
             
             } 
             else if(!sameHost){
 
-                if(host){
-                    if(host.indexOf(this.url.digested.host!) !== -1 && this.queue.indexOf(url) !== -1){
+                if(host && host !== "/"){
+
+                    if(host.indexOf(this.url.digested.host!) !== -1 && this.queue.indexOf(url) === -1){
                         
                         this.queue.push(url);
                         this.savePath(path ?? "/", <string> this.url.digested.host)
                     
                     }
-                    else if(this.hosts.indexOf(host) !== -1){
+                    else if(this.hosts.indexOf(host) === -1){
 
-                        this.hosts.push(url);
-                        this.savePath(path ?? "/", <string> host)
+                        this.hosts.push(host);
+                        this.savePath(path ?? "/", host)
 
                     } 
+
+                }
+                else if(host === "/"){
+                    this.savePath(path ?? "/", <string> this.url.digested.host)
                 }
                 
             }
             
-        }     
+        }    
 
     }
 
@@ -171,15 +175,5 @@ export default class Tree extends EventEmitter {
         });
 
     }
-
-    public extendQueue(path : string = "", host : string = "") {
-
-    }
-
-    
-
-
-
-
 
 }

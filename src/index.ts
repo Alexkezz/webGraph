@@ -5,8 +5,9 @@ let URL : string = <string> CONFIG.url;
 let tree : Tree = new Tree(URL)
 
 tree.on("error", (err : string) => throwError(err));
-// tree.on("done", (url : string) => {console.log(url)});
+tree.on("done", (url : string) => {console.log(url)});
 
 tree.tree().then((schema : HostPathSchema) => {
+    console.log("-------------FINISH------------------")
     console.log(schema)
 });

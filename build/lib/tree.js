@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const events_1 = require("events");
 const url_1 = __importDefault(require("./url"));
 const axios_1 = __importDefault(require("axios"));
+axios_1.default.defaults.headers.common['User-Agent'] = 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36';
 class Tree extends events_1.EventEmitter {
     constructor(url) {
         super();
@@ -36,7 +37,6 @@ class Tree extends events_1.EventEmitter {
             this.queue.push(this.url.url);
             for (let i = 0; i < this.queue.length; i++) {
                 let url = this.queue[i];
-                // console.log(this.queue);
                 let structure = new url_1.default(url).digest();
                 let reqOption = {
                     url: url,
@@ -45,8 +45,8 @@ class Tree extends events_1.EventEmitter {
                     path: (_a = structure.path) !== null && _a !== void 0 ? _a : "/",
                     headers: ""
                 };
-                //console.log("Extreient info url:" + reqOption.url);
                 let content = yield this.getContent(reqOption);
+                this.emit("done", url);
                 let urls = this.extract(content);
                 this.check(urls);
             }
@@ -89,26 +89,27 @@ class Tree extends events_1.EventEmitter {
     }
     check(urls) {
         for (let url of urls) {
-            console.log(url);
             let urlDigest = new url_1.default(url).digest();
             let host = urlDigest.host;
             let path = urlDigest.path;
-            console.log(host);
             let sameHost = this.url.compareHost(host);
-            if (sameHost && this.queue.indexOf(url) !== -1) {
+            if (sameHost && this.queue.indexOf(url) === -1) {
                 this.queue.push(url);
                 this.savePath(path !== null && path !== void 0 ? path : "/", this.url.digested.host);
             }
             else if (!sameHost) {
-                if (host) {
-                    if (host.indexOf(this.url.digested.host) !== -1 && this.queue.indexOf(url) !== -1) {
+                if (host && host !== "/") {
+                    if (host.indexOf(this.url.digested.host) !== -1 && this.queue.indexOf(url) === -1) {
                         this.queue.push(url);
                         this.savePath(path !== null && path !== void 0 ? path : "/", this.url.digested.host);
                     }
-                    else if (this.hosts.indexOf(host) !== -1) {
-                        this.hosts.push(url);
+                    else if (this.hosts.indexOf(host) === -1) {
+                        this.hosts.push(host);
                         this.savePath(path !== null && path !== void 0 ? path : "/", host);
                     }
+                }
+                else if (host === "/") {
+                    this.savePath(path !== null && path !== void 0 ? path : "/", this.url.digested.host);
                 }
             }
         }
@@ -118,8 +119,6 @@ class Tree extends events_1.EventEmitter {
             path: path,
             host: host,
         });
-    }
-    extendQueue(path = "", host = "") {
     }
 }
 exports.default = Tree;

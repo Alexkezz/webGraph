@@ -81,6 +81,6 @@ export default class Url {
     }
 
     public compareHost(host : undefinedStr) {
-        return (this.digested.host === host || host === "/");
+        return (this.digested.host === host);
     }
 }

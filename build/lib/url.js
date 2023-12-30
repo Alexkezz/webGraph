@@ -53,7 +53,7 @@ class Url {
         return path;
     }
     compareHost(host) {
-        return (this.digested.host === host || host === "/");
+        return (this.digested.host === host);
     }
 }
 exports.default = Url;
