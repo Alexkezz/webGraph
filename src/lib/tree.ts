@@ -82,6 +82,8 @@ export default class Tree extends EventEmitter {
         
         const body = await axios.get(reqOtion.url).then( (res) => {
             return res.data;
+        }).catch(() => {
+            return "";
         })
 
         return body;
@@ -133,7 +135,7 @@ export default class Tree extends EventEmitter {
             
             let sameHost = this.url.compareHost(host);
 
-            if(sameHost && this.queue.indexOf(url) === -1) {
+            if((sameHost || host === "/") && this.queue.indexOf(url) === -1) {
                 
                 this.queue.push(url);
                 this.savePath(path ?? "/", <string> this.url.digested.host)

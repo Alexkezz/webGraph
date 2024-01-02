@@ -61,6 +61,8 @@ class Tree extends events_1.EventEmitter {
         return __awaiter(this, void 0, void 0, function* () {
             const body = yield axios_1.default.get(reqOtion.url).then((res) => {
                 return res.data;
+            }).catch(() => {
+                return "";
             });
             return body;
         });
@@ -93,7 +95,7 @@ class Tree extends events_1.EventEmitter {
             let host = urlDigest.host;
             let path = urlDigest.path;
             let sameHost = this.url.compareHost(host);
-            if (sameHost && this.queue.indexOf(url) === -1) {
+            if ((sameHost || host === "/") && this.queue.indexOf(url) === -1) {
                 this.queue.push(url);
                 this.savePath(path !== null && path !== void 0 ? path : "/", this.url.digested.host);
             }
