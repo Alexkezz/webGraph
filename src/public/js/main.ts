@@ -1,5 +1,5 @@
 import { CONFIG, strUndf, throwError } from "./lib/config.js";
-import Tree , {PathParams, HostPathSchema} from "./lib/tree.js";
+import Tree , { PathParams, HostPathSchema } from "./lib/tree.js";
 
 let URL : string = <string> CONFIG.url;
 let tree : Tree = new Tree(URL)
